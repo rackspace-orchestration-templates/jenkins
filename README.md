@@ -66,6 +66,9 @@ the `-P` flag to specify a custom parameter.
 * `flavor`: Cloud server size to use. (Default: 4 GB Performance)
 * `ssh_keypair_name`: Name of the SSH key pair to register with nova (Default:
   none)
+* `install_rax_canon_theme`: Boolean to determine if the
+  [canon-jenkins](https://github.com/rackerlabs/canon-jenkins#after) theme is
+  installed (Default: false)
 
 Outputs
 =======
