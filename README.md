@@ -60,7 +60,7 @@ Parameters
 Parameters can be replaced with your own values when standing up a stack. Use
 the `-P` flag to specify a custom parameter.
 
-* `server_hostname`: Sets the hostname of the server. (Default: minecraft)
+* `server_hostname`: Sets the hostname of the server. (Default: jenkins)
 * `image`: Operating system to install (Default: Ubuntu 12.04 LTS (Precise
   Pangolin))
 * `flavor`: Cloud server size to use. (Default: 4 GB Performance)
