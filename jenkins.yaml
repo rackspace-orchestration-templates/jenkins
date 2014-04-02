@@ -1,0 +1,175 @@
+heat_template_version: 2013-05-23
+
+description: |
+  This is a Heat template to deploy a single Linux server running a Jenkins.
+  Additional nodes can also be deployed using this template.
+
+parameter_groups:
+
+- label: Server Settings
+  parameters:
+  - server_hostname
+  - image
+  - flavor
+  - ssh_keypair_name
+
+- label: Jenkins Settings
+  parameters:
+  - install_rax_canon_theme
+
+parameters:
+
+  server_hostname:
+    description: Server Name
+    type: string
+    default: jenkins
+    constraints:
+    - length:
+        min: 1
+        max: 64
+    - allowed_pattern: "^[a-zA-Z][a-zA-Z0-9-]*$"
+      description: |
+        Must begin with a letter and contain only alphanumeric characters.
+
+  image:
+    description: Server Image
+    type: string
+    default: Ubuntu 12.04 LTS (Precise Pangolin)
+    constraints:
+    - allowed_values:
+      - Ubuntu 12.04 LTS (Precise Pangolin)
+      description: Must be a supported operating system.
+
+  flavor:
+    description: Rackspace Cloud Server flavor
+    type: string
+    default: 4 GB Performance
+    constraints:
+    - allowed_values:
+      - 1 GB Performance
+      - 2 GB Performance
+      - 4 GB Performance
+      - 8 GB Performance
+      - 15 GB Performance
+      - 30 GB Performance
+      - 1GB Standard Instance
+      - 2GB Standard Instance
+      - 4GB Standard Instance
+      - 8GB Standard Instance
+      - 15GB Standard Instance
+      - 30GB Standard Instance
+      description: |
+        Must be a valid Rackspace Cloud Server flavor for the region you have
+        selected to deploy into.
+
+  ssh_keypair_name:
+    description: Nova keypair name for ssh access to the server
+    type: string
+    constraints:
+    - allowed_pattern: "^(.){1,64}$"
+      description: "Must be shorter than 64 characters or fewer."
+
+  install_rax_canon_theme:
+    description: Install Rackspace Canon Themee
+    type: string
+    default: false
+
+resources:
+
+  ssh_key:
+    type: "OS::Nova::KeyPair"
+    properties:
+      name: { get_param: ssh_keypair_name }
+      save_private_key: true
+
+  jenkins_server:
+    type: "Rackspace::Cloud::Server"
+    properties:
+      name: { get_param: server_hostname }
+      flavor: { get_param: flavor }
+      image: { get_param: image }
+      key_name: { get_resource: ssh_key }
+
+  jenkins_setup:
+    type: "OS::Heat::ChefSolo"
+    depends_on: jenkins_server
+    properties:
+      username: root
+      private_key: { get_attr: [ssh_key, private_key] }
+      host: { get_attr: [jenkins_server, accessIPv4] }
+      Berksfile: |
+        site :opscode
+
+        cookbook 'apt'
+        cookbook 'build-essential'
+        cookbook 'git'
+        cookbook 'jenkins',
+          :git => 'https://github.com/opscode-cookbooks/jenkins',
+          :ref => '8cd35f36a133561828e7c6923e66de2aca896c6d'
+        cookbook 'rax-jenkins',
+          :git => 'https://github.com/brint/rax-jenkins',
+          :ref => 'ab1281ebc1728994eab708d98ba1c09c181d01e3'
+        cookbook 'rax-firewall',
+          :git => 'https://github.com/brint/rax-firewall-cookbook',
+          :ref => 'deae4c112d7d692302cd83e96df4fbd7c8a6e22b'
+      node:
+        jenkins:
+          master:
+            jenkins_args: '--httpsPort=8081'
+          executor:
+            timeout: 240
+        rax:
+          firewall:
+            tcp: [8080, 8081]
+          jenkins:
+            plugins: ["credentials",
+                      "ssh-credentials",
+                      "scm-api",
+                      "multiple-scms",
+                      "git-client",
+                      "git",
+                      "github-api",
+                      "github",
+                      "ghprb",
+                      "jquery",
+                      "backup",
+                      "mailer",
+                      "javadoc",
+                      "maven-plugin",
+                      "violations",
+                      "dashboard-view",
+                      "buildgraph-view",
+                      "parameterized-trigger",
+                      "build-pipeline-plugin",
+                      "jclouds-jenkins",
+                      "simple-theme-plugin"]
+            install_theme: { get_param: install_rax_canon_theme }
+        run_list: ["recipe[apt]",
+                   "recipe[build-essential]",
+                   "recipe[git]",
+                   "recipe[jenkins::master]",
+                   "recipe[rax-jenkins::cli]",
+                   "recipe[rax-jenkins::plugins]",
+                   "recipe[rax-jenkins::rax-canon]",
+                   "recipe[rax-firewall]"]
+
+outputs:
+  private_key:
+    value: { get_attr: [ssh_key, private_key] }
+
+  server_ip:
+    value: { get_attr: [jenkins_server, accessIPv4] }
+
+  jenkins_http_url:
+    value:
+      str_replace:
+        template: "http://%server_ip%:8080"
+        params:
+          "%server_ip%": { get_attr: [jenkins_server, accessIPv4] }
+
+  jenkins_https_url:
+    value:
+      str_replace:
+        template: "https://%server_ip%:8081"
+        params:
+          "%server_ip%": { get_attr: [jenkins_server, accessIPv4] }
