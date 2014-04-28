@@ -1,0 +1,5 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<org.codefirst.SimpleThemeDecorator plugin="simple-theme-plugin@0.3">
+<cssUrl>https://8ab972673b5689e842a8-4ce0e842e9a020b19bb3a8bec8532674.ssl.cf1.rackcdn.com/canon-jenkins/style.css</cssUrl>
+<jsUrl>https://577351e10bc4a0198d93-f60a0bb748a3c84145bb10da7563bafb.ssl.cf1.rackcdn.com/canon-jenkins/app.min.js</jsUrl>
+</org.codefirst.SimpleThemeDecorator>
