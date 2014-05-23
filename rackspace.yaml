@@ -4,6 +4,9 @@ application-name: Jenkins
 application-version: latest
 flavor: Single Linux server running Jenkins CI
 flavor-weight: 1
+reach-info:
+  tattoo: https://0b5294b243620310a700-e388a7f3aba385a925111b1fc6f680d4.ssl.cf2.rackcdn.com/jenkins-tattoo.png
+  icon-20x20: https://0b5294b243620310a700-e388a7f3aba385a925111b1fc6f680d4.ssl.cf2.rackcdn.com/jenkins-icon-20x20.png
 abstract: |
   A single Linux server running [Jenkins
   CI](http://jenkins-ci.org/content/about-jenkins-ci) Server.
@@ -11,6 +14,23 @@ abstract: |
   Plugins such as
   [JClouds](https://wiki.jenkins-ci.org/display/JENKINS/JClouds+Plugin) are
   included to ease scaling of your deployment.
-reach-info:
-  tattoo: https://0b5294b243620310a700-e388a7f3aba385a925111b1fc6f680d4.ssl.cf2.rackcdn.com/jenkins-tattoo.png
-  icon-20x20: https://0b5294b243620310a700-e388a7f3aba385a925111b1fc6f680d4.ssl.cf2.rackcdn.com/jenkins-icon-20x20.png
+instructions: |
+  #### Accessing Jenkins
+  In a browser, navigate to the URL provided in the output section. Once logged
+  in, you can immediately create a [new
+  job](https://wiki.jenkins-ci.org/display/JENKINS/Building+a+software+project)!
+
+  #### Logging in via SSH
+  The private key provided in the passwords section can be used to login as
+  root via SSH.  We have an article on how to use these keys with [Mac OS X and
+  Linux](http://www.rackspace.com/knowledge_center/article/logging-in-with-a-ssh-private-key-on-linuxmac)
+  as well as [Windows using
+  PuTTY](http://www.rackspace.com/knowledge_center/article/logging-in-with-a-ssh-private-key-on-windows).
+
+  #### Plugins
+  Jenkins offers a wide range of useful plugins that can be used to expand both
+  the features as well as capacity of your test environments. Check out the
+  [Jenkins
+  Plugins](https://wiki.jenkins-ci.org/display/JENKINS/Plugins#Plugins-Usingtheinterface)
+  documentation for information on how to easily install and use plugins
+  through the web interface.
