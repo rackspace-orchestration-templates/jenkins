@@ -8,14 +8,18 @@ parameter_groups:
 
 - label: Server Settings
   parameters:
-  - server_hostname
   - image
   - flavor
-  - ssh_keypair_name
 
 - label: Jenkins Settings
   parameters:
   - install_rax_canon_theme
+
+- label: rax-dev-params
+  parameters:
+  - server_hostname
+  - kitchen
+  - chef_version
 
 parameters:
 
@@ -33,8 +37,10 @@ parameters:
         Must begin with a letter and contain only alphanumeric characters.
 
   image:
-    label: Server Image
-    description: Server Image
+    label: Operating System
+    description: |
+      Server image used for all servers that are created as a part of this
+      deployment
     type: string
     default: Ubuntu 12.04 LTS (Precise Pangolin)
     constraints:
@@ -44,7 +50,9 @@ parameters:
 
   flavor:
     label: Server Size
-    description: Rackspace Cloud Server flavor
+    description: |
+      Rackspace Cloud Server flavor to use. The size is based on the amount of
+      RAM for the provisioned server.
     type: string
     default: 4 GB Performance
     constraints:
@@ -65,13 +73,6 @@ parameters:
         Must be a valid Rackspace Cloud Server flavor for the region you have
         selected to deploy into.
 
-  ssh_keypair_name:
-    description: Nova keypair name for ssh access to the server
-    type: string
-    constraints:
-    - allowed_pattern: "^(.){1,64}$"
-      description: "Must be shorter than 64 characters or fewer."
-
   install_rax_canon_theme:
     label: Theme
     description: Install Rackspace Canon Theme
@@ -88,14 +89,14 @@ parameters:
     label: Chef Version
     description: Version of chef client to use
     type: string
-    default: 11.12.2
+    default: 11.12.8
 
 resources:
 
   ssh_key:
     type: "OS::Nova::KeyPair"
     properties:
-      name: { get_param: ssh_keypair_name }
+      name: { get_param: "OS::stack_id" }
       save_private_key: true
 
   jenkins_server:
@@ -158,12 +159,15 @@ resources:
 
 outputs:
   private_key:
+    description: SSH Private Key
     value: { get_attr: [ssh_key, private_key] }
 
   server_ip:
+    description: Server IP
     value: { get_attr: [jenkins_server, accessIPv4] }
 
   jenkins_http_url:
+    description: Jenkins HTTP URL
     value:
       str_replace:
         template: "http://%server_ip%:8080"
@@ -171,6 +175,7 @@ outputs:
           "%server_ip%": { get_attr: [jenkins_server, accessIPv4] }
 
   jenkins_https_url:
+    description: Jenkins HTTPS URL
     value:
       str_replace:
         template: "https://%server_ip%:8081"
