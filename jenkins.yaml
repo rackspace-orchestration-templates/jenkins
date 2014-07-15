@@ -147,7 +147,7 @@ resources:
                       "build-pipeline-plugin",
                       "jclouds-jenkins",
                       "simple-theme-plugin"]
-            install_theme: { get_param: install_rax_canon_theme }
+            # install_theme: { get_param: install_rax_canon_theme }
         run_list: ["recipe[apt]",
                    "recipe[build-essential]",
                    "recipe[git]",
