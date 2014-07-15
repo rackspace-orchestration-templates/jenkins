@@ -11,9 +11,9 @@ parameter_groups:
   - image
   - flavor
 
-- label: Jenkins Settings
-  parameters:
-  - install_rax_canon_theme
+# - label: Jenkins Settings
+#  parameters:
+#  - install_rax_canon_theme
 
 - label: rax-dev-params
   parameters:
@@ -73,11 +73,11 @@ parameters:
         Must be a valid Rackspace Cloud Server flavor for the region you have
         selected to deploy into.
 
-  install_rax_canon_theme:
-    label: Theme
-    description: Install Rackspace Canon Theme
-    type: string
-    default: false
+  # install_rax_canon_theme:
+  #  label: Theme
+  #  description: Install Rackspace Canon Theme
+  #  type: string
+  #  default: false
 
   kitchen:
     label: Kitchen
