@@ -1,3 +1,6 @@
 Berksfile.lock
 Gemfile.lock
 .ruby-version
+
+tmp
+*.pyc
