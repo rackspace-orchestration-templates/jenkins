@@ -1,11 +1,15 @@
 import re
+
 from fabric.api import env, run, hide, task
 from envassert import detect, file, package, port, process, service, user
+from time import sleep
 
 
 def jenkins_is_responding_on_http():
     with hide('running', 'stdout'):
-        homepage = run("wget --quiet --output-document - http://localhost:8080/")
+        sleep(10)  # Jenkins can take a few seconds to come up when started
+        site = "http://localhost:8080/"
+        homepage = run("wget --quiet --output-document - %s" % site)
         if re.search('Dashboard \[Jenkins\]', homepage):
             return True
         else:
