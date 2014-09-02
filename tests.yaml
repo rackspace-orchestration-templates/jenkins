@@ -1,7 +1,7 @@
 test-cases:
 - name: Default Build Test # Deploy using all default options
   create:
-    timeout: 30 # Deployment should complete in under 30 minutes
+    timeout: 45 # Deployment should complete in under 45 minutes
   resource_tests: # Tests to run on the resources themselves
     ssh_private_key: { get_output: private_key } # Fetch from output-list of stack
     ssh_key_file: tmp/private_key # File to write with ssh_private_key
