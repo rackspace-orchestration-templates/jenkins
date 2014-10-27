@@ -3,7 +3,6 @@
 #
 module Serverspec
   module Type
-    # rubocop:disable PredicateName, CaseEquality
     class JenkinsUser < Base
       require 'rexml/document'
 
@@ -29,6 +28,10 @@ module Serverspec
       def has_public_key?(key)
         keys = try { xml.elements['//authorizedKeys'].text.split("\n").map(&:strip) } || []
         keys.include?(key.to_s)
+      end
+
+      def password_hash
+        try { xml.elements['//passwordHash'].text }
       end
 
       private

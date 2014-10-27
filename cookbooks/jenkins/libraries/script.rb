@@ -20,16 +20,19 @@
 #
 
 require_relative 'command'
+require_relative '_params_validate'
 
 class Chef
   class Resource::JenkinsScript < Resource::JenkinsCommand
-    def initialize(name, run_context = nil)
-      super
+    # Chef attributes
+    provides :jenkins_script
 
-      # Set the resource name and provider
-      @resource_name = :jenkins_script
-      @provider = Provider::JenkinsScript
-    end
+    # Set the resource name
+    self.resource_name = :jenkins_script
+
+    # Actions
+    actions :execute
+    default_action :execute
   end
 end
 
@@ -37,12 +40,18 @@ class Chef
   class Provider::JenkinsScript < Provider::JenkinsCommand
     def load_current_resource
       @current_resource ||= Resource::JenkinsScript.new(new_resource.command)
+      super
     end
 
-    def action_execute
+    action(:execute) do
       converge_by("Execute script #{new_resource}") do
         executor.groovy!(new_resource.command)
       end
     end
   end
 end
+
+Chef::Platform.set(
+  resource: :jenkins_script,
+  provider: Chef::Provider::JenkinsScript
+)

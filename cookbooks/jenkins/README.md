@@ -18,11 +18,11 @@ Public Service Announcment
 ----------------------------
 If you are using jenkins with authentication:  until [JENKINS-22346](https://issues.jenkins-ci.org/browse/JENKINS-22346) is fixed, pin to version 1.555 of jenkins and use the `war` installation method:
 
-````
+```ruby
 node.default['jenkins']['master']['install_method'] = 'war'
 node.default['jenkins']['master']['version'] = '1.555'
 node.default['jenkins']['master']['source'] = "#{node['jenkins']['master']['mirror']}/war/#{node['jenkins']['master']['version']}/jenkins.war"
-````
+```
 
 JENKINS-22346 affects the `jenkins-cli` command, whose use by this cookbook is described in the Caveats section under Authentication.
 
@@ -54,8 +54,6 @@ Resource/Provider
 This resource executes arbitrary commands against the [Jenkins CLI](https://wiki.jenkins-ci.org/display/JENKINS/Jenkins+CLI), supporting the following actions:
 
     :execute
-
-Here's an [example list of Jenkins commands](https://gist.github.com/sethvargo/7814182), although these can change with major version releases. For example, to perform a Jenkins safe restart:
 
 ```ruby
 jenkins_command 'safe-restart'
@@ -219,7 +217,10 @@ This resource manages Jenkins plugins, supporting the following actions:
 
     :install, :uninstall, :enable, :disable
 
-This uses the Jenkins CLI to install plugins. By default, it does a cold deploy, meaning the plugin is installed while Jenkins is still running. **This LWRP does not install plugin dependencies - you must specify all plugin dependencies or Jenkins may not startup correctly!**
+This uses the Jenkins CLI to install plugins. By default, it does a cold deploy, meaning the plugin is installed while Jenkins is still running. Some plugins may require you restart the Jenkins instance for their changed to take affect.
+
+- **Since 2.1.1 this resource does install plugin dependecies by default**
+- **This resource does not install plugin dependencies from a a given hpi/jpi - you must specify all plugin dependencies or Jenkins may not startup correctly!**
 
 The `:install` action idempotely installs a Jenkins plugin on the current node. The name attribute corresponds to the name of the plugin on the Jenkins Update Center. You can also specify a particular version of the plugin to install. Finally, you can specify a full source URL or local path (on the node) to a plugin.
 
@@ -235,6 +236,22 @@ end
 # Install a plugin from a given hpi (or jpi)
 jenkins_plugin 'greenballs' do
   source 'http://updates.jenkins-ci.org/download/plugins/greenballs/1.10/greenballs.hpi'
+end
+```
+
+Depending on the plugin, you may need to restart the Jenkins instance for the plugin to take affect:
+
+```ruby
+jenkins_plugin 'a_complicated_plugin' do
+  notifies :restart, 'service[jenkins]', :immediately
+end
+```
+
+For advanced users, this resource exposes an `options` attribute that will be passed to the installation command. For more information on the possible values of these options, pleaes consult the documentation for your Jenkins installation.
+
+```ruby
+jenkins_plugin 'a_really_complicated_plugin' do
+  options '-deploy -cold'
 end
 ```
 
@@ -296,8 +313,9 @@ jenkins_ssh_slave 'executor' do
   labels      ['executor', 'freebsd', 'jail']
 
   # SSH specific attributes
-  host     '172.11.12.53' # or 'slave.example.org'
-  username 'jenkins'
+  host        '172.11.12.53' # or 'slave.example.org'
+  user        'jenkins'
+  credentials 'wcoyote'
 end
 
 # A slave's executors, usage mode and availability can also be configured
@@ -430,22 +448,22 @@ end
 Caveats
 -------
 ### Authentication
-If you use or plan to use authentication for your Jenkins cluster (which we highly recommend), you will need to set a special node attribute:
+If you use or plan to use authentication for your Jenkins cluster (which we highly recommend), you will need to set a special value in the `run_context`:
 
 ```ruby
-node['jenkins']['executor']['private_key']
+node.run_state[:jenkins_private_key]
 ```
 
-The underlying executor class (which all LWRPs use) intelligently adds authentication information to the Jenkins CLI commands if this attribute is set. The method used to generate and populate this key-pair is left to the user:
+The underlying executor class (which all LWRPs use) intelligently adds authentication information to the Jenkins CLI commands if this value is set. The method used to generate and populate this key-pair is left to the user:
 
 ```ruby
 # Using search
 master = search(:node, 'fqdn:master.ci.example.com').first
-node.set['jenkins']['executor']['private_key'] = master['jenkins']['private_key']
+node.run_state[:jenkins_private_key] = master['jenkins']['private_key']
 
 # Using encrypted data bags and chef-sugar
 private_key = encrypted_data_bag_item('jenkins', 'keys')['private_key']
-node.set['jenkins']['executor']['private_key'] = private_key
+node.run_state[:jenkins_private_key] = private_key
 ```
 
 The associated public key must be set on a Jenkins user. You can use the `jenkins_user` resource to create this pairing. Here's an example that uses OpenSSL to create a keypair and assigns it appropiately:
@@ -464,7 +482,7 @@ end
 
 # Set the private key on the Jenkins executor
 ruby_block 'set private key' do
-  block { node.set['jenkins']['executor']['private_key'] = private_key }
+  block { node.run_state[:jenkins_private_key] = private_key }
 end
 ```
 

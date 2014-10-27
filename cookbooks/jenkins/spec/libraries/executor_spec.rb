@@ -17,12 +17,12 @@ describe Jenkins::Executor do
 
   describe '#execute!' do
     let(:shellout) { double(run_command: nil, error!: nil, stdout: '') }
-    before { Mixlib::ShellOut.stub(:new).and_return(shellout) }
+    before { allow(Mixlib::ShellOut).to receive(:new).and_return(shellout) }
 
     context 'when no options are given' do
       it 'builds the correct command' do
         command = 'java -jar /usr/share/jenkins/cli/java/cli.jar foo'
-        expect(Mixlib::ShellOut).to receive(:new).with(command, timeout: 30)
+        expect(Mixlib::ShellOut).to receive(:new).with(command, timeout: 60)
         subject.execute!('foo')
       end
     end
@@ -31,14 +31,14 @@ describe Jenkins::Executor do
       it 'builds the correct command' do
         subject.options[:endpoint] = 'http://jenkins.ci'
         command = 'java -jar /usr/share/jenkins/cli/java/cli.jar -s http://jenkins.ci foo'
-        expect(Mixlib::ShellOut).to receive(:new).with(command, timeout: 30)
+        expect(Mixlib::ShellOut).to receive(:new).with(command, timeout: 60)
         subject.execute!('foo')
       end
 
       it 'escapes the endpoint' do
         subject.options[:endpoint] = 'http://jenkins.ci?foo=this is a text'
         command = 'java -jar /usr/share/jenkins/cli/java/cli.jar -s http://jenkins.ci?foo=this%20is%20a%20text foo'
-        expect(Mixlib::ShellOut).to receive(:new).with(command, timeout: 30)
+        expect(Mixlib::ShellOut).to receive(:new).with(command, timeout: 60)
         subject.execute!('foo')
       end
     end
@@ -47,14 +47,14 @@ describe Jenkins::Executor do
       it 'builds the correct command' do
         subject.options[:key] = '/key/path.pem'
         command = 'java -jar /usr/share/jenkins/cli/java/cli.jar -i /key/path.pem foo'
-        expect(Mixlib::ShellOut).to receive(:new).with(command, timeout: 30)
+        expect(Mixlib::ShellOut).to receive(:new).with(command, timeout: 60)
         subject.execute!('foo')
       end
 
       it 'shell escapes the key path' do
         subject.options[:key] = '/key/path/to /pem with/spaces.pem'
         command = 'java -jar /usr/share/jenkins/cli/java/cli.jar -i /key/path/to\\ /pem\\ with/spaces.pem foo'
-        expect(Mixlib::ShellOut).to receive(:new).with(command, timeout: 30)
+        expect(Mixlib::ShellOut).to receive(:new).with(command, timeout: 60)
         subject.execute!('foo')
       end
     end
@@ -63,28 +63,28 @@ describe Jenkins::Executor do
       it 'builds the correct command' do
         subject.options[:proxy] = 'http://proxy.jenkins.ci'
         command = 'java -jar /usr/share/jenkins/cli/java/cli.jar -p http://proxy.jenkins.ci foo'
-        expect(Mixlib::ShellOut).to receive(:new).with(command, timeout: 30)
+        expect(Mixlib::ShellOut).to receive(:new).with(command, timeout: 60)
         subject.execute!('foo')
       end
 
       it 'escapes the proxy' do
         subject.options[:proxy] = 'http://proxy.jenkins.ci?foo=this is a text'
         command = 'java -jar /usr/share/jenkins/cli/java/cli.jar -p http://proxy.jenkins.ci?foo=this%20is%20a%20text foo'
-        expect(Mixlib::ShellOut).to receive(:new).with(command, timeout: 30)
+        expect(Mixlib::ShellOut).to receive(:new).with(command, timeout: 60)
         subject.execute!('foo')
       end
     end
 
     context 'when the command fails' do
       it 'raises an error' do
-        shellout.stub(:error!).and_raise(RuntimeError)
+        allow(shellout).to receive(:error!).and_raise(RuntimeError)
         expect { subject.execute!('bad') }.to raise_error
       end
     end
   end
 
   describe '#execute' do
-    before { subject.stub(:execute!) }
+    before { allow(subject).to receive(:execute!) }
 
     it 'calls #execute!' do
       expect(subject).to receive(:execute).with('foo', 'bar')
@@ -93,28 +93,28 @@ describe Jenkins::Executor do
 
     context 'when the command fails' do
       it 'does not raise an error' do
-        subject.stub(:execute!).and_raise(Mixlib::ShellOut::ShellCommandFailed)
+        allow(subject).to receive(:execute!).and_raise(Mixlib::ShellOut::ShellCommandFailed)
         expect { subject.execute('foo') }.to_not raise_error
       end
     end
   end
 
   describe '#groovy!' do
-    before { subject.stub(:execute!) }
+    before { allow(subject).to receive(:execute!) }
 
     it 'calls execute!' do
       expect(subject).to receive(:execute!)
-        .with("groovy = <<-GROOVY_SCRIPT\nscript\nGROOVY_SCRIPT")
+        .with(/^groovy \S+/)
       subject.groovy('script')
     end
   end
 
   describe '#groovy' do
-    before { subject.stub(:execute) }
+    before { allow(subject).to receive(:execute) }
 
     it 'calls execute' do
       expect(subject).to receive(:execute)
-        .with("groovy = <<-GROOVY_SCRIPT\nscript\nGROOVY_SCRIPT")
+        .with(/^groovy \S+/)
       subject.groovy('script')
     end
   end

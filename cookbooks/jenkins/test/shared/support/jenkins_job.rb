@@ -3,7 +3,6 @@
 #
 module Serverspec
   module Type
-    # rubocop:disable PredicateName, CaseEquality
     class JenkinsJob < Base
       require 'rexml/document'
 
@@ -28,6 +27,11 @@ module Serverspec
 
       def has_command?(command)
         command === try { xml.elements['//command'].text }
+      end
+
+      def has_plugin_like?(rx)
+        plugin = try { xml.root.attributes['plugin'] }
+        plugin.nil? ? false : plugin =~ rx
       end
 
       private
