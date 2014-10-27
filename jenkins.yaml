@@ -25,7 +25,7 @@ parameters:
 
   server_hostname:
     label: Server Name
-    description: Server Name
+    description: Sets the hostname of the server.
     type: string
     default: jenkins
     constraints:
@@ -42,10 +42,11 @@ parameters:
       Server image used for all servers that are created as a part of this
       deployment
     type: string
-    default: Ubuntu 12.04 LTS (Precise Pangolin)
+    default: Ubuntu 14.04 LTS (Trusty Tahr)
     constraints:
     - allowed_values:
       - Ubuntu 12.04 LTS (Precise Pangolin)
+      - Ubuntu 14.04 LTS (Trusty Tahr)
       description: Must be a supported operating system.
 
   flavor:
@@ -89,7 +90,7 @@ parameters:
     label: Chef Version
     description: Version of chef client to use
     type: string
-    default: 11.12.8
+    default: 11.16.4
 
 resources:
 
@@ -152,7 +153,6 @@ resources:
                    "recipe[build-essential]",
                    "recipe[git]",
                    "recipe[jenkins::master]",
-                   "recipe[rax-jenkins::cli]",
                    "recipe[rax-jenkins::plugins]",
                    "recipe[rax-jenkins::rax-canon]",
                    "recipe[rax-firewall]"]

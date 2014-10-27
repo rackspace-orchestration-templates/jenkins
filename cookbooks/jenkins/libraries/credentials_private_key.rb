@@ -20,17 +20,28 @@
 #
 
 require_relative 'credentials'
+require_relative '_params_validate'
 
 class Chef
   class Resource::JenkinsPrivateKeyCredentials < Resource::JenkinsCredentials
+    require 'openssl'
+
+    # Chef attributes
     provides :jenkins_private_key_credentials
 
-    def initialize(name, run_context = nil)
-      super
+    # Set the resource name
+    self.resource_name = :jenkins_private_key_credentials
 
-      @resource_name = :jenkins_private_key_credentials
-      @provider = Provider::JenkinsPrivateKeyCredentials
-    end
+    # Actions
+    actions :create, :delete
+    default_action :create
+
+    # Attributes
+    attribute :private_key,
+      kind_of: [String, OpenSSL::PKey::RSA],
+      required: true
+    attribute :passphrase,
+      kind_of: String
 
     #
     # Private key of the credentials . This should be the actual key
@@ -40,23 +51,12 @@ class Chef
     # @param [String] arg
     # @return [String]
     #
-    def private_key(arg = nil)
-      if arg.nil?
-        @private_key
+    def rsa_private_key
+      if private_key.is_a?(OpenSSL::PKey::RSA)
+        private_key.to_pem
       else
-        arg = OpenSSL::PKey::RSA.new(arg).to_pem unless arg.empty?
-        set_or_return(:private_key, arg, kind_of: String)
+        OpenSSL::PKey::RSA.new(private_key).to_pem
       end
-    end
-
-    #
-    # Passphrase for the private key of the credentials.
-    #
-    # @param [String] arg
-    # @return [String]
-    #
-    def passphrase(arg = nil)
-      set_or_return(:passphrase, arg, kind_of: String)
     end
   end
 end
@@ -71,6 +71,8 @@ class Chef
       if current_credentials
         @current_resource.private_key(current_credentials[:private_key])
       end
+
+      @current_resource
     end
 
     protected
@@ -84,7 +86,7 @@ class Chef
         import com.cloudbees.plugins.credentials.*
         import com.cloudbees.jenkins.plugins.sshcredentials.impl.*
 
-        private_key = """#{new_resource.private_key}
+        private_key = """#{new_resource.rsa_private_key}
         """
 
         credentials = new BasicSSHUserPrivateKey(
@@ -123,3 +125,8 @@ class Chef
     end
   end
 end
+
+Chef::Platform.set(
+  resource: :jenkins_private_key_credentials,
+  provider: Chef::Provider::JenkinsPrivateKeyCredentials
+)

@@ -70,7 +70,7 @@ default['jenkins']['master'].tap do |master|
   # Warning: Setting this attribute will negate/ignore any values for +mirror+
   # and +version+.
   #
-  master['source'] = "#{jenkins['master']['mirror']}/war/#{jenkins['master']['version'] || 'latest'}/jenkins.war"
+  master['source'] = "#{node['jenkins']['master']['mirror']}/war/#{node['jenkins']['master']['version'] || 'latest'}/jenkins.war"
 
   #
   # The checksum of the war file. This is use to verify that the remote war file
@@ -136,6 +136,11 @@ default['jenkins']['master'].tap do |master|
   master['host'] = 'localhost'
 
   #
+  # The address bound to the Jenkins process. The default value binds to all interfaces.
+  #
+  master['listen_address'] = '0.0.0.0'
+
+  #
   # The port which the Jenkins process will listen on.
   #
   master['port'] = 8080
@@ -150,7 +155,7 @@ default['jenkins']['master'].tap do |master|
   #
   #   node.set['jenkins']['master']['endpoint'] = 'https://custom.domain.com/jenkins'
   #
-  master['endpoint'] = "http://#{jenkins['master']['host']}:#{jenkins['master']['port']}"
+  master['endpoint'] = "http://#{node['jenkins']['master']['host']}:#{node['jenkins']['master']['port']}"
 
   #
   # The path to the Jenkins home location. This will also become the value of

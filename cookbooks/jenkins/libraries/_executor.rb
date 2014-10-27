@@ -21,6 +21,7 @@
 
 require 'mixlib/shellout'
 require 'shellwords'
+require 'tempfile'
 require 'uri'
 
 module Jenkins
@@ -49,8 +50,9 @@ module Jenkins
     #
     def initialize(options = {})
       @options = {
-        cli:  '/usr/share/jenkins/cli/java/cli.jar',
-        java: 'java',
+        cli:     '/usr/share/jenkins/cli/java/cli.jar',
+        java:    'java',
+        timeout: 60,
       }.merge(options)
     end
 
@@ -72,7 +74,7 @@ module Jenkins
       command << " -p #{uri_escape(options[:proxy])}"    if options[:proxy]
       command << " #{pieces.join(' ')}"
 
-      command = Mixlib::ShellOut.new(command, timeout: 30)
+      command = Mixlib::ShellOut.new(command, timeout: options[:timeout])
       command.run_command
       command.error!
       command.stdout.strip
@@ -101,7 +103,12 @@ module Jenkins
     #   the standard out from the command
     #
     def groovy!(script)
-      execute!("groovy = <<-GROOVY_SCRIPT\n#{script}\nGROOVY_SCRIPT")
+      file = Tempfile.new('groovy')
+      file.write script
+      file.flush
+      execute!("groovy #{file.path}")
+    ensure
+      file.close! if file
     end
 
     #
@@ -110,7 +117,12 @@ module Jenkins
     # @see groovy!
     #
     def groovy(script)
-      execute("groovy = <<-GROOVY_SCRIPT\n#{script}\nGROOVY_SCRIPT")
+      file = Tempfile.new('groovy')
+      file.write script
+      file.flush
+      execute("groovy #{file.path}")
+    ensure
+      file.close! if file
     end
 
     private
