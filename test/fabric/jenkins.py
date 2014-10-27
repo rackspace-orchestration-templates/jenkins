@@ -21,8 +21,7 @@ def check():
     env.platform_family = detect.detect()
 
     assert package.installed("jenkins")
-    assert package.installed("jenkins-cli")
-    assert file.exists("/etc/jenkins/cli.conf")
+    assert file.exists("/var/lib/jenkins/hudson.model.UpdateCenter.xml")
     assert port.is_listening(8080)
     assert port.is_listening(8081)
     assert user.exists("jenkins")
