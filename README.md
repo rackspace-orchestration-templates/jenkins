@@ -61,14 +61,14 @@ Parameters can be replaced with your own values when standing up a stack. Use
 the `-P` flag to specify a custom parameter.
 
 * `server_hostname`: Sets the hostname of the server. (Default: jenkins)
-* `image`: Operating system to install (Default: Ubuntu 12.04 LTS (Precise
-  Pangolin))
-* `flavor`: Cloud server size to use. (Default: 4 GB Performance)
-* `ssh_keypair_name`: Name of the SSH key pair to register with nova (Default:
-  none)
-* `install_rax_canon_theme`: Boolean to determine if the
-  [canon-jenkins](https://github.com/rackerlabs/canon-jenkins#after) theme is
-  installed (Default: false)
+* `image`: Server image used for all servers that are created as a part of this
+  deployment (Default: Ubuntu 14.04 LTS (Trusty Tahr))
+* `chef_version`: Version of chef client to use (Default: 11.16.4)
+* `flavor`: Rackspace Cloud Server flavor to use. The size is based on the
+  amount of RAM for the provisioned server. (Default: 4 GB Performance)
+* `kitchen`: URL for the kitchen to use (Default:
+  https://github.com/rackspace-orchestration-templates/jenkins)
+
 
 Outputs
 =======
