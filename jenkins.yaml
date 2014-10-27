@@ -153,7 +153,6 @@ resources:
                    "recipe[build-essential]",
                    "recipe[git]",
                    "recipe[jenkins::master]",
-                   "recipe[rax-jenkins::cli]",
                    "recipe[rax-jenkins::plugins]",
                    "recipe[rax-jenkins::rax-canon]",
                    "recipe[rax-firewall]"]
