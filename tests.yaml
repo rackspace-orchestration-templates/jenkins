@@ -23,7 +23,7 @@ test-cases:
             fabfile: test/fabric/jenkins.py # Path to envassert test
 - name: Ubuntu 12.04 Test
   create:
-    image: Ubuntu 12.04 LTS (Precise Pangolin)
+    image: Ubuntu 12.04 LTS (Precise Pangolin) (PVHVM)
     timeout: 45 # Deployment should complete in under 45 minutes
   resource_tests: # Tests to run on the resources themselves
     ssh_private_key: { get_output: private_key } # Fetch from output-list of stack
