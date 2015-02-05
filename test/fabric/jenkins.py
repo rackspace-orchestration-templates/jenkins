@@ -3,6 +3,8 @@ import re
 from fabric.api import env, run, hide, task
 from envassert import detect, file, package, port, process, service, user
 from time import sleep
+from hot.utils.test import get_artifacts, http_check
+
 
 
 def jenkins_is_responding_on_http():
@@ -28,3 +30,9 @@ def check():
     assert process.is_up("daemon")
     assert service.is_enabled("jenkins")
     assert jenkins_is_responding_on_http()
+
+
+@task
+def artifacts():
+    env.platform_family = detect.detect()
+    get_artifacts()
