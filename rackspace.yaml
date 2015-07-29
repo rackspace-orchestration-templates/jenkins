@@ -36,3 +36,9 @@ instructions: |
   Plugins](https://wiki.jenkins-ci.org/display/JENKINS/Plugins#Plugins-Usingtheinterface)
   documentation for information on how to easily install and use plugins
   through the web interface.
+description: |
+  A single Linux server running the lastest stable version of
+  [Jenkins CI](http://jenkins-ci.org/content/about-jenkins-ci) Server.
+  Plugins such as
+  [JClouds](https://wiki.jenkins-ci.org/display/JENKINS/JClouds+Plugin)
+  are included to ease scaling of your deployment.
