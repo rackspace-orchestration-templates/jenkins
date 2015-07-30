@@ -10,12 +10,8 @@ reach-info:
 hidden_outputs:
   - private_key
 abstract: |
-  A single Linux server running [Jenkins
-  CI](http://jenkins-ci.org/content/about-jenkins-ci) Server.
-
-  Plugins such as
-  [JClouds](https://wiki.jenkins-ci.org/display/JENKINS/JClouds+Plugin) are
-  included to ease scaling of your deployment.
+  Jenkins is an open-source continuous integration software that provides a
+  configurable code review process.
 instructions: |
   #### Accessing Jenkins
   In a browser, navigate to the URL provided in the output section. Once logged
