@@ -1,8 +1,11 @@
 heat_template_version: 2013-05-23
 
 description: |
-  This is a Heat template to deploy a single Linux server running a Jenkins.
-  Additional nodes can also be deployed using this template.
+  A single Linux server running the lastest stable version of
+  [Jenkins CI](http://jenkins-ci.org/content/about-jenkins-ci) Server.
+  Plugins such as
+  [JClouds](https://wiki.jenkins-ci.org/display/JENKINS/JClouds+Plugin)
+  are included to ease scaling of your deployment.
 
 parameter_groups:
 
