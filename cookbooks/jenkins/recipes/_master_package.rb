@@ -33,6 +33,8 @@ when 'debian'
 
   package 'jenkins' do
     version node['jenkins']['master']['version']
+    #Jenkins is failing in post-install, but working normally.  Ignore errors for now to install successfully
+    ignore_failure true
   end
 
   template '/etc/default/jenkins' do
