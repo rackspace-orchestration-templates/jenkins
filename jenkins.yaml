@@ -87,7 +87,7 @@ parameters:
     label: Kitchen
     description: URL for the kitchen to use
     type: string
-    default: https://github.com/rackspace-orchestration-templates/jenkins
+    default: https://github.com/chrishultin/jenkins
 
   chef_version:
     label: Chef Version
